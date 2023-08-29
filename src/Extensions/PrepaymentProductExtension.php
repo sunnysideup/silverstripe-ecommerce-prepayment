@@ -62,18 +62,23 @@ class PrepaymentProductExtension extends DataExtension
     protected function IsPrepaymentReady(): bool
     {
         $owner = $this->getOwner();
-        return $owner->PrepaymentPercentage || $owner->ForSaleFrom;
+        return $owner->PrepaymentPercentage && $owner->ForSaleFrom;
     }
 
     protected function IsOnPresale(): bool
     {
         $owner = $this->getOwner();
-        $date = $owner->ForSaleFrom;
-        if ($date) {
+        if($this->IsPrepaymentReady()) {
             return $owner->dbObject('ForSaleFrom')->InPast() ? false : true;
         }
 
         return false;
+    }
+
+    protected function IsPostPresale(): bool
+    {
+        $owner = $this->getOwner();
+        return $this->IsPrepaymentReady() === true && $this->IsOnPresale() === false;
     }
 
 

@@ -7,7 +7,7 @@ use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\FieldType\DBField;
 
-class PrepaymentProductOrderItemExtension extends DataExtension
+class PrepaymentOrderItemExtension extends DataExtension
 {
     public function updateSubTableTitle()
     {

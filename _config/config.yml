@@ -3,4 +3,15 @@ Name: ecommerce-prepayment
 After:
   - '#coreconfig'
 ---
-
+Sunnysideup\Ecommerce\Model\Config\EcommerceDBConfig:
+  extensions:
+    - Sunnysideup\EcommercePrepayment\Exensions\PrepaymentConfigExtension
+SilverStripe\Security\Member:
+  extensions:
+    - Sunnysideup\EcommercePrepayment\Exensions\PrepaymentMemberExtension
+Sunnysideup\Ecommerce\Pages\Product:
+  extensions:
+    - Sunnysideup\EcommercePrepayment\Exensions\PrepaymentProductExtension
+Sunnysideup\Ecommerce\Model\OrderItem:
+  extensions:
+    - Sunnysideup\EcommercePrepayment\Exensions\PrepaymentOrderItemExtension
