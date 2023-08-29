@@ -5,13 +5,13 @@ After:
 ---
 Sunnysideup\Ecommerce\Model\Config\EcommerceDBConfig:
   extensions:
-    - Sunnysideup\EcommercePrepayment\Exensions\PrepaymentConfigExtension
+    - Sunnysideup\EcommercePrepayment\Extensions\PrepaymentConfigExtension
 SilverStripe\Security\Member:
   extensions:
-    - Sunnysideup\EcommercePrepayment\Exensions\PrepaymentMemberExtension
+    - Sunnysideup\EcommercePrepayment\Extensions\PrepaymentMemberExtension
 Sunnysideup\Ecommerce\Pages\Product:
   extensions:
-    - Sunnysideup\EcommercePrepayment\Exensions\PrepaymentProductExtension
+    - Sunnysideup\EcommercePrepayment\Extensions\PrepaymentProductExtension
 Sunnysideup\Ecommerce\Model\OrderItem:
   extensions:
-    - Sunnysideup\EcommercePrepayment\Exensions\PrepaymentOrderItemExtension
+    - Sunnysideup\EcommercePrepayment\Extensions\PrepaymentOrderItemExtension

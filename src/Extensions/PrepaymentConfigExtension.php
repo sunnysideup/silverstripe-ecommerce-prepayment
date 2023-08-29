@@ -5,10 +5,6 @@ namespace Sunnysideup\EcommercePrepayment\Extensions;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
 use SilverStripe\ORM\DataExtension;
-use SilverStripe\Security\Member;
-use Sunnysideup\Ecommerce\Model\Config\EcommerceDBConfig;
-use Sunnysideup\Ecommerce\Model\ProductOrderItem;
-use Sunnysideup\Ecommerce\Pages\Product;
 
 class PrepaymentConfigExtension extends DataExtension
 {
