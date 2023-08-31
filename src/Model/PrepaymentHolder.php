@@ -31,6 +31,7 @@ class PrepaymentHolder extends DataObject
     private static $table_name = 'PrepaymentHolder';
     private static $db = [
         'PrepaidAmount' => 'Currency',
+        'Completed' => 'Boolean',
     ];
 
     private static $has_one = [
@@ -57,6 +58,11 @@ class PrepaymentHolder extends DataObject
     ];
 
     public function getLoginAndAddToCartLink(): string
+    {
+        return Director::absoluteURL('/Security/login?BackURL='.$this->Product()->addLink());
+    }
+
+    public function getOrderLink(): string
     {
         return Director::absoluteURL('/Security/login?BackURL='.$this->Product()->addLink());
     }

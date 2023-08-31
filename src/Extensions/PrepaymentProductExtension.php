@@ -2,7 +2,9 @@
 
 namespace Sunnysideup\EcommercePrepayment\Extensions;
 
+use SilverStripe\Forms\CurrencyField;
 use SilverStripe\Forms\DateField;
+use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordViewer;
@@ -15,8 +17,9 @@ use Sunnysideup\EcommercePrepayment\Model\PrepaymentHolder;
 class PrepaymentProductExtension extends DataExtension
 {
     private static $db = [
+        'PrepaymentStatus' => 'Enum("Normal, On Presale, Post Presale Unlimited Availability", "Normal")',
         'PrepaymentPercentage' => 'Percentage',
-        'ForSaleFrom' => 'DBDatetime',
+        'PrepaymentFixed' => 'Currency',
         'PrepaymentMessageWithProduct' => 'HTMLText',
     ];
 
@@ -25,23 +28,23 @@ class PrepaymentProductExtension extends DataExtension
     ];
 
 
-
-    private $discountCouponAmount;
-
     /**
      * Update Fields.
      */
     public function updateCMSFields(FieldList $fields)
     {
+        $owner = $this->getOwner();
         $fields->addFieldsToTab(
             'Root.Price',
             [
-                NumericField::create('PrepaymentPercentage', 'Prepayment Percentage'),
-                DateField::create('ForSalFrom', 'For Sale From')
+                DropdownField::create('PrepaymentStatus', 'Prepayment Status', $owner->dbObject('PrepaymentStatus')->enumValues()),
+                CurrencyField::create('PrepaymentFixed', 'Prepayment Fixed Amount'),
+                NumericField::create('PrepaymentPercentage', 'Prepayment Percentage of Price'),
+                DateField::create('ForSaleFrom', 'For Sale From')
                     ->setDescription('Leave empty if you want to sell the product immediately. Products will go on sale from midnight on the specified date.'),
             ]
         );
-        if($this->IsPrepaymentReady()) {
+        if($this->HasPrepayment()) {
             $fields->addFieldsToTab(
                 'Root.Price',
                 [
@@ -59,30 +62,34 @@ class PrepaymentProductExtension extends DataExtension
     }
 
 
-    protected function IsPrepaymentReady(): bool
+    public function HasPrepayment(): bool
     {
         $owner = $this->getOwner();
-        return $owner->PrepaymentPercentage && $owner->ForSaleFrom;
+        return $owner->PrepaymentStatus !== 'Normal';
     }
 
-    protected function IsOnPresale(): bool
+    public function IsOnPresale(): bool
     {
         $owner = $this->getOwner();
-        if($this->IsPrepaymentReady()) {
-            return $owner->dbObject('ForSaleFrom')->InPast() ? false : true;
+        if($this->HasPrepayment()) {
+            return $owner->PrepaymentStatus === 'On Presale';
+
         }
 
         return false;
     }
 
-    protected function IsPostPresale(): bool
+    public function IsPostPresale(): bool
     {
         $owner = $this->getOwner();
-        return $this->IsPrepaymentReady() === true && $this->IsOnPresale() === false;
+        if($this->HasPrepayment()) {
+            return $owner->PrepaymentStatus !== 'On Presale';
+        }
+        return false;
     }
 
 
-    public function getMemberPrepaidAmount(): float
+    public function getMemberPrepaidAmount(): ?float
     {
         $owner = $this->getOwner();
         $member = Security::getCurrentUser();
@@ -101,26 +108,20 @@ class PrepaymentProductExtension extends DataExtension
     public function updateCalculatedPrice(?float $price = null)
     {
         $owner = $this->getOwner();
-        if ($owner->PrepaymentPercentage()) {
-            if($this->IsOnPresale()) {
-                return $price * $owner->PrepaymentPercentage();
-            } else {
-                $prepaidAmount = $this->getMemberPrepaidAmount();
-                if($prepaidAmount) {
-                    return $price - $prepaidAmount;
-                }
+        if($this->IsOnPresale()) {
+            if ($owner->PrepaymentPercentage || $owner->PrepaymentFixed) {
+                return ($price * $owner->PrepaymentPercentage) + $owner->PrepaymentFixed;
+            }
+        }
+        if($this->IsPostPresale()) {
+            $prepaidAmount = $owner->getMemberPrepaidAmount();
+            if($prepaidAmount) {
+                return $price - $prepaidAmount;
             }
         }
         return null;
     }
 
-    public function CanPurchase($member = null): ?bool
-    {
-        if($this->IsOnPresale()) {
-            return $member || Security::getCurrentUser() ? true : false;
-        }
-        return null;
-    }
 
 
 

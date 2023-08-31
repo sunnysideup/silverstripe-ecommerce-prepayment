@@ -39,7 +39,7 @@ class PrepaymentAlertAvailabilityOrderStep extends OrderStep implements OrderSte
         'Name' => 'Prepayment alert availability',
         'Code' => 'PREPAYMENT_ALERT_AVAILABILITY',
         'ShowAsInProcessOrder' => 1,
-        'SendMessageToCustomer' => 1,
+        'SendMessageToCustomer' => 0,
     ];
 
     public function getCMSFields()
