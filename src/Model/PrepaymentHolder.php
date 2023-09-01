@@ -2,12 +2,12 @@
 
 namespace Sunnysideup\EcommercePrepayment\Model;
 
-use Demo\Product;
 use SilverStripe\Control\Director;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
 use Sunnysideup\Ecommerce\Interfaces\BuyableModel;
 use Sunnysideup\Ecommerce\Model\Order;
+use Sunnysideup\Ecommerce\Pages\Product;
 
 class PrepaymentHolder extends DataObject
 {
