@@ -11,7 +11,9 @@ use SilverStripe\Forms\GridField\GridFieldConfig_RecordViewer;
 use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
 use SilverStripe\Forms\NumericField;
 use SilverStripe\ORM\DataExtension;
+use SilverStripe\ORM\FieldType\DBMoney;
 use SilverStripe\Security\Security;
+use Sunnysideup\Ecommerce\Model\Money\EcommerceCurrency;
 use Sunnysideup\EcommercePrepayment\Model\PrepaymentHolder;
 
 class PrepaymentProductExtension extends DataExtension
@@ -44,7 +46,7 @@ class PrepaymentProductExtension extends DataExtension
                     ->setDescription('Leave empty if you want to sell the product immediately. Products will go on sale from midnight on the specified date.'),
             ]
         );
-        if($this->HasPrepayment()) {
+        if($this->HasPrepaymentConditions()) {
             $fields->addFieldsToTab(
                 'Root.Price',
                 [
@@ -62,16 +64,20 @@ class PrepaymentProductExtension extends DataExtension
     }
 
 
-    public function HasPrepayment(): bool
+    public function HasPrepaymentConditions(): bool
     {
         $owner = $this->getOwner();
+        if(! $owner->canPurchase()) {
+            return false;
+        }
+
         return $owner->PrepaymentStatus !== 'Normal';
     }
 
     public function IsOnPresale(): bool
     {
         $owner = $this->getOwner();
-        if($this->HasPrepayment()) {
+        if($this->HasPrepaymentConditions()) {
             return $owner->PrepaymentStatus === 'On Presale';
 
         }
@@ -82,7 +88,7 @@ class PrepaymentProductExtension extends DataExtension
     public function IsPostPresale(): bool
     {
         $owner = $this->getOwner();
-        if($this->HasPrepayment()) {
+        if($this->HasPrepaymentConditions()) {
             return $owner->PrepaymentStatus !== 'On Presale';
         }
         return false;
@@ -100,28 +106,103 @@ class PrepaymentProductExtension extends DataExtension
         return 0;
     }
 
+
     /**
      * @param float $price
      *
      * @return null|float
      */
-    public function updateCalculatedPrice(?float $price = null)
+    public function getPresalePostPresaleAmountForMember(?float $price = null): ?float
     {
         $owner = $this->getOwner();
+        $price = $owner->getCalculatedPrice();
         if($this->IsOnPresale()) {
-            if ($owner->PrepaymentPercentage || $owner->PrepaymentFixed) {
-                return ($price * $owner->PrepaymentPercentage) + $owner->PrepaymentFixed;
-            }
+            return $this->getPresaleAmount($price);
         }
         if($this->IsPostPresale()) {
-            $prepaidAmount = $owner->getMemberPrepaidAmount();
-            if($prepaidAmount) {
-                return $price - $prepaidAmount;
-            }
+            return $this->getPostPresaleAmountForMember($price);
         }
         return null;
     }
 
+    /**
+     * @param float $price
+     *
+     * @return null|float
+     */
+    public function getPresaleAmount(?float $price = null): ?float
+    {
+        $owner = $this->getOwner();
+        if(! $price) {
+            $price = $owner->getCalculatedPrice();
+        }
+        if ($owner->PrepaymentPercentage || $owner->PrepaymentFixed) {
+            return ($price * $owner->PrepaymentPercentage) + $owner->PrepaymentFixed;
+        }
+        return $price;
+    }
+
+    /**
+     * @param float $price
+     *
+     * @return null|float
+     */
+    public function getPostPresaleAmount(?float $price = null): ?float
+    {
+        $owner = $this->getOwner();
+        if(! $price) {
+            $price = $owner->getCalculatedPrice();
+        }
+        return $price - $this->getPresaleAmount($price);
+    }
+
+    /**
+     * @param float $price
+     *
+     * @return null|float
+     */
+    public function getPostPresaleAmountForMember(?float $price = null): ?float
+    {
+        $owner = $this->getOwner();
+        if(! $price) {
+            $price = $owner->getCalculatedPrice();
+        }
+        $prepaidAmount = $owner->getMemberPrepaidAmount();
+        if($prepaidAmount) {
+            return $price - $prepaidAmount;
+        }
+        return null;
+    }
+
+    /**
+     * @param float $price
+     *
+     * @return null|DBMoney
+     */
+    public function getMemberPrepaidAmountAsMoney(?float $price = null): ?DBMoney
+    {
+        return EcommerceCurrency::get_money_object_from_order_currency($this->getPostPresaleAmount());
+    }
+
+    /**
+     * @param float $price
+     *
+     * @return null|DBMoney
+     */
+    public function getPresalePostPresaleAmountForMemberAsMoney(?float $price = null): ?DBMoney
+    {
+        return EcommerceCurrency::get_money_object_from_order_currency($this->getPresalePostPresaleAmountForMember());
+    }
+
+    /**
+     * @param float $price
+     *
+     * @return null|DBMoney
+     */
+    public function getPostPresaleAmountAsMoney(?float $price = null): ?DBMoney
+    {
+        return EcommerceCurrency::get_money_object_from_order_currency($this->getPostPresaleAmount());
+    }
 
 
 

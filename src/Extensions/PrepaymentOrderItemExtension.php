@@ -9,26 +9,43 @@ use SilverStripe\ORM\FieldType\DBField;
 
 class PrepaymentOrderItemExtension extends DataExtension
 {
-    public function updateSubTableTitle()
+    public function updateSubTableTitle($title)
     {
         $owner = $this->getOwner();
         $product = $owner->Product();
         if($product->IsOnPresale()) {
-            return 'Prepayment of '.$product->PrepaymentPercentage.'% only.';
+            $fullPriceAsMoney = $product->CalculatedPriceAsMoney();
+            $remainingAmountAsMoney = $product->getPostPresaleAmountAsMoney();
+            return '<strong>Prepayment only. Full price is '.$fullPriceAsMoney->Nice(). '. Remaining amount to pay afer this order: '.$remainingAmountAsMoney->Nice().'</strong>';
         } else {
-            $memberPrepaidAmount = $product->getMemberPrepaidAmount();
-            if($memberPrepaidAmount) {
-                $memberPrepaidAmountObject = DBField::create_field('Currency', $memberPrepaidAmount);
-                return 'Prepayment of '.$memberPrepaidAmountObject->Nice().' deducted from price.';
+            $amount = $product->PresalePostPresaleAmountForMember();
+            if($amount) {
+                $fullPriceAsMoney = $product->CalculatedPriceAsMoney();
+                $memberPrepaidAmount = $product->getMemberPrepaidAmountAsMoney();
+                return '<strong>Prepayment of '.$memberPrepaidAmount->Nice().' deducted from full price ('.$fullPriceAsMoney.').</strong>';
 
             }
         }
         return null;
     }
 
-    public function updateTableTitle()
+    public function updateUnitPrice(float $unitPrice): ?float
     {
+        $owner = $this->getOwner();
+        $product = $owner->Product();
+        if($product->IsOnPresale() || $product->IsOnPostPresale()) {
+            return $product->getPresalePostPresaleAmountForMember();
+        }
         return null;
+    }
+
+    public function runUpdateExtension($orderItem)
+    {
+        $owner = $this->getOwner();
+        $product = $owner->Product();
+        if($product->IsOnPresale()) {
+            $orderItem->HasPhysicalDispatch = false;
+        }
     }
 
 
