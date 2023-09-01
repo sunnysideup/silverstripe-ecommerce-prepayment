@@ -16,9 +16,9 @@ class PrepaymentOrderItemExtension extends DataExtension
         if($product->IsOnPresale()) {
             $fullPriceAsMoney = $product->CalculatedPriceAsMoney();
             $remainingAmountAsMoney = $product->getPostPresaleAmountAsMoney();
-            return '<strong>Prepayment only. Full price is '.$fullPriceAsMoney->Nice(). '. Remaining amount to pay afer this order: '.$remainingAmountAsMoney->Nice().'</strong>';
+            return '<strong>Prepayment only. Full price is '.$fullPriceAsMoney->Nice(). '. Remaining amount is '.$remainingAmountAsMoney->Nice().'.</strong>';
         } else {
-            $amount = $product->PresalePostPresaleAmountForMember();
+            $amount = $product->getPresalePostPresaleAmountForMember();
             if($amount) {
                 $fullPriceAsMoney = $product->CalculatedPriceAsMoney();
                 $memberPrepaidAmount = $product->getMemberPrepaidAmountAsMoney();
@@ -33,7 +33,7 @@ class PrepaymentOrderItemExtension extends DataExtension
     {
         $owner = $this->getOwner();
         $product = $owner->Product();
-        if($product->IsOnPresale() || $product->IsOnPostPresale()) {
+        if($product->IsOnPresale() || $product->IsPostPresale()) {
             return $product->getPresalePostPresaleAmountForMember();
         }
         return null;
@@ -44,7 +44,11 @@ class PrepaymentOrderItemExtension extends DataExtension
         $owner = $this->getOwner();
         $product = $owner->Product();
         if($product->IsOnPresale()) {
-            $orderItem->HasPhysicalDispatch = false;
+            $test = (bool) $orderItem->HasPhysicalDispatch;
+            if($test !== false) {
+                $orderItem->HasPhysicalDispatch = false;
+                $orderItem->write();
+            }
         }
     }
 
