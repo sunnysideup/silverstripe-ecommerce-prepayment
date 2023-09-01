@@ -15,3 +15,7 @@ Sunnysideup\Ecommerce\Pages\Product:
 Sunnysideup\Ecommerce\Model\OrderItem:
   extensions:
     - Sunnysideup\EcommercePrepayment\Extensions\PrepaymentOrderItemExtension
+
+Sunnysideup\Ecommerce\Cms\SalesAdmin:
+  managed_models:
+    - Sunnysideup\EcommercePrepayment\Model\PrepaymentHolder

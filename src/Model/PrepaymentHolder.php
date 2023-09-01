@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommercePrepayment\Model;
 
+use Respect\Validation\Helpers\CanValidateDateTime;
 use SilverStripe\Control\Director;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
@@ -39,9 +40,6 @@ class PrepaymentHolder extends DataObject
         'Buyable' => Product::class,
         'Order' => Order::class,
     ];
-    private static $has_many = [
-        'PrepaymentMessages' => PrepaymentMessage::class,
-    ];
 
     private static $summary_fields = [
         'Created' => 'Created',
@@ -65,5 +63,15 @@ class PrepaymentHolder extends DataObject
     public function getOrderLink(): string
     {
         return Director::absoluteURL('/Security/login?BackURL='.$this->Product()->addLink());
+    }
+
+    public function canDelete($member = null)
+    {
+        return false;
+    }
+
+    public function canEdit($member = null)
+    {
+        return false;
     }
 }
