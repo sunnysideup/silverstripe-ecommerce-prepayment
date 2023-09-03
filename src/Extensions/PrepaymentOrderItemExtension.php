@@ -2,10 +2,7 @@
 
 namespace Sunnysideup\EcommercePrepayment\Extensions;
 
-use SilverStripe\Forms\FieldList;
-use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
 use SilverStripe\ORM\DataExtension;
-use SilverStripe\ORM\FieldType\DBField;
 
 class PrepaymentOrderItemExtension extends DataExtension
 {
@@ -15,10 +12,13 @@ class PrepaymentOrderItemExtension extends DataExtension
         $product = $owner->Product();
         if($product->IsOnPresale()) {
             $fullPriceAsMoney = $product->CalculatedPriceAsMoney();
-            $remainingAmountAsMoney = $product->getPostPresaleAmountAsMoney();
-            return '<strong>Prepayment only. Full price is '.$fullPriceAsMoney->Nice(). '. Remaining amount is '.$remainingAmountAsMoney->Nice().'.</strong>';
+            $remainingAmountAsMoney = $product->getPostPresaleAmountAsMoney($owner->Quantity);
+            return '
+                <strong>Prepayment only.
+                Full price is '.$fullPriceAsMoney->Nice(). ' per item.
+                <br />Remaining amount to be paid on arrival is '.$remainingAmountAsMoney->Nice().'.</strong>';
         } else {
-            $amount = $product->getPresalePostPresaleAmountForMember();
+            $amount = $product->getNextAmountForMember();
             if($amount) {
                 $fullPriceAsMoney = $product->CalculatedPriceAsMoney();
                 $memberPrepaidAmount = $product->getMemberPrepaidAmountAsMoney();
@@ -34,7 +34,7 @@ class PrepaymentOrderItemExtension extends DataExtension
         $owner = $this->getOwner();
         $product = $owner->Product();
         if($product->IsOnPresale() || $product->IsPostPresale()) {
-            return $product->getPresalePostPresaleAmountForMember();
+            return $product->getNextAmountForMember();
         }
         return null;
     }

@@ -12,6 +12,7 @@ use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
 use SilverStripe\Forms\NumericField;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\FieldType\DBMoney;
+use SilverStripe\ORM\FieldType\DBPercentage;
 use SilverStripe\Security\Security;
 use Sunnysideup\Ecommerce\Model\Money\EcommerceCurrency;
 use Sunnysideup\EcommercePrepayment\Model\PrepaymentHolder;
@@ -20,7 +21,7 @@ class PrepaymentProductExtension extends DataExtension
 {
     private static $db = [
         'PrepaymentStatus' => 'Enum("Normal, On Presale, Post Presale Unlimited Availability", "Normal")',
-        'PrepaymentPercentage' => 'Percentage',
+        'PrepaymentPercentage' => DBPercentage::class,
         'PrepaymentFixed' => 'Currency',
         'PrepaymentMessageWithProduct' => 'HTMLText',
     ];
@@ -41,7 +42,8 @@ class PrepaymentProductExtension extends DataExtension
             [
                 DropdownField::create('PrepaymentStatus', 'Prepayment Status', $owner->dbObject('PrepaymentStatus')->enumValues()),
                 CurrencyField::create('PrepaymentFixed', 'Prepayment Fixed Amount'),
-                NumericField::create('PrepaymentPercentage', 'Prepayment Percentage of Price'),
+                NumericField::create('PrepaymentPercentage', 'Prepayment Percentage of Price')
+                    ->setScale(2),
                 DateField::create('ForSaleFrom', 'For Sale From')
                     ->setDescription('Leave empty if you want to sell the product immediately. Products will go on sale from midnight on the specified date.'),
             ]
@@ -95,15 +97,15 @@ class PrepaymentProductExtension extends DataExtension
     }
 
 
-    public function getMemberPrepaidAmount(): ?float
+    public function getMemberPrepaidAmount(): float
     {
         $owner = $this->getOwner();
         $member = Security::getCurrentUser();
         if ($member) {
-            return $member->getPrepaidAmount($owner);
+            return (float) $member->getPrepaidAmount($owner);
         }
 
-        return 0;
+        return (float) 0;
     }
 
 
@@ -112,15 +114,15 @@ class PrepaymentProductExtension extends DataExtension
      *
      * @return null|float
      */
-    public function getPresalePostPresaleAmountForMember(?float $price = null): ?float
+    public function getNextAmountForMember(): ?float
     {
         $owner = $this->getOwner();
         $price = $owner->getCalculatedPrice();
         if($this->IsOnPresale()) {
-            return $this->getPresaleAmount($price);
+            return $this->getPresaleAmount();
         }
         if($this->IsPostPresale()) {
-            return $this->getPostPresaleAmountForMember($price);
+            return $this->getPostPresaleAmountForMember();
         }
         return null;
     }
@@ -130,14 +132,12 @@ class PrepaymentProductExtension extends DataExtension
      *
      * @return null|float
      */
-    public function getPresaleAmount(?float $price = null): ?float
+    public function getPresaleAmount(?int $quantity = 1): ?float
     {
         $owner = $this->getOwner();
-        if(! $price) {
-            $price = $owner->getCalculatedPrice();
-        }
+        $price = $owner->getCalculatedPrice();
         if ($owner->PrepaymentPercentage || $owner->PrepaymentFixed) {
-            return ($price * $owner->PrepaymentPercentage) + $owner->PrepaymentFixed;
+            return (($price * $owner->PrepaymentPercentage) + $owner->PrepaymentFixed) * $quantity;
         }
         return $price;
     }
@@ -147,13 +147,11 @@ class PrepaymentProductExtension extends DataExtension
      *
      * @return null|float
      */
-    public function getPostPresaleAmount(?float $price = null): ?float
+    public function getPostPresaleAmount(?int $quantity = 1): ?float
     {
         $owner = $this->getOwner();
-        if(! $price) {
-            $price = $owner->getCalculatedPrice();
-        }
-        return $price - $this->getPresaleAmount($price);
+        $price = $owner->getCalculatedPrice();
+        return ($price - $this->getPresaleAmount()) * $quantity;
     }
 
     /**
@@ -161,12 +159,10 @@ class PrepaymentProductExtension extends DataExtension
      *
      * @return null|float
      */
-    public function getPostPresaleAmountForMember(?float $price = null): ?float
+    public function getPostPresaleAmountForMember(): ?float
     {
         $owner = $this->getOwner();
-        if(! $price) {
-            $price = $owner->getCalculatedPrice();
-        }
+        $price = $owner->getCalculatedPrice();
         $prepaidAmount = $owner->getMemberPrepaidAmount();
         if($prepaidAmount) {
             return $price - $prepaidAmount;
@@ -179,7 +175,17 @@ class PrepaymentProductExtension extends DataExtension
      *
      * @return null|DBMoney
      */
-    public function getMemberPrepaidAmountAsMoney(?float $price = null): ?DBMoney
+    public function getPresaleAmountAsMoney(?int $quantity = 1): ?DBMoney
+    {
+        return EcommerceCurrency::get_money_object_from_order_currency($this->getPresaleAmount($quantity));
+    }
+
+    /**
+     * @param float $price
+     *
+     * @return null|DBMoney
+     */
+    public function getMemberPrepaidAmountAsMoney(): ?DBMoney
     {
         return EcommerceCurrency::get_money_object_from_order_currency($this->getPostPresaleAmount());
     }
@@ -189,9 +195,9 @@ class PrepaymentProductExtension extends DataExtension
      *
      * @return null|DBMoney
      */
-    public function getPresalePostPresaleAmountForMemberAsMoney(?float $price = null): ?DBMoney
+    public function getNextAmountForMemberAsMoney(): ?DBMoney
     {
-        return EcommerceCurrency::get_money_object_from_order_currency($this->getPresalePostPresaleAmountForMember());
+        return EcommerceCurrency::get_money_object_from_order_currency($this->getNextAmountForMember());
     }
 
     /**
@@ -199,9 +205,9 @@ class PrepaymentProductExtension extends DataExtension
      *
      * @return null|DBMoney
      */
-    public function getPostPresaleAmountAsMoney(?float $price = null): ?DBMoney
+    public function getPostPresaleAmountAsMoney(?int $quantity = 1): ?DBMoney
     {
-        return EcommerceCurrency::get_money_object_from_order_currency($this->getPostPresaleAmount());
+        return EcommerceCurrency::get_money_object_from_order_currency($this->getPostPresaleAmount($quantity));
     }
 
 
