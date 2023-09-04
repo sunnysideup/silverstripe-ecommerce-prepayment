@@ -22,7 +22,7 @@ class PrepaymentOrderItemExtension extends DataExtension
             if($amount) {
                 $fullPriceAsMoney = $product->CalculatedPriceAsMoney();
                 $memberPrepaidAmount = $product->getMemberPrepaidAmountAsMoney();
-                return '<strong>Prepayment of '.$memberPrepaidAmount->Nice().' deducted from full price ('.$fullPriceAsMoney.').</strong>';
+                return '<strong>Prepayment of '.$memberPrepaidAmount->Nice().' deducted from full price ('.$fullPriceAsMoney->Nice().').</strong>';
 
             }
         }

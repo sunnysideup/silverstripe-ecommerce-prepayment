@@ -187,7 +187,7 @@ class PrepaymentProductExtension extends DataExtension
      */
     public function getMemberPrepaidAmountAsMoney(): ?DBMoney
     {
-        return EcommerceCurrency::get_money_object_from_order_currency($this->getPostPresaleAmount());
+        return EcommerceCurrency::get_money_object_from_order_currency($this->getMemberPrepaidAmount());
     }
 
     /**
