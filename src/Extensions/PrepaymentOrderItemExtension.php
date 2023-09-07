@@ -19,10 +19,10 @@ class PrepaymentOrderItemExtension extends DataExtension
                 <br />Remaining amount to be paid on arrival is '.$remainingAmountAsMoney->Nice().'.</strong>';
         } else {
             $amount = $product->getNextAmountForMember();
-            if($amount) {
+            if($amount > 0) {
                 $fullPriceAsMoney = $product->CalculatedPriceAsMoney();
                 $memberPrepaidAmount = $product->getMemberPrepaidAmountAsMoney();
-                return '<strong>Prepayment of '.$memberPrepaidAmount->Nice().' deducted from full price ('.$fullPriceAsMoney.').</strong>';
+                return '<strong>Prepayment of '.$memberPrepaidAmount->Nice().' deducted from the full price of '.$fullPriceAsMoney->Nice().'.</strong>';
 
             }
         }

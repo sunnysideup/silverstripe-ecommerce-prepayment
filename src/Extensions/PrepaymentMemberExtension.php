@@ -12,12 +12,13 @@ class PrepaymentMemberExtension extends DataExtension
         'PrepaidAmounts' => PrepaymentHolder::class,
     ];
 
-    public function getPrepaidAmount(BuyableModel $buyable)
+    public function getPrepaidAmount(BuyableModel $buyable): ?float
     {
         $owner = $this->getOwner();
         if($owner->PrepaidAmounts()->exists()) {
-            return $owner->PrepaidAmounts()->filter(['Buyable' => $buyable->ID])->sum('PrepaidAmount');
+            return $owner->PrepaidAmounts()->filter(['BuyableID' => $buyable->ID])->sum('PrepaidAmount');
         }
+        return 1000;
     }
 
 

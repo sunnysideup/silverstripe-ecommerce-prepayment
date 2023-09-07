@@ -4,8 +4,11 @@ namespace Sunnysideup\EcommercePrepayment\Model;
 
 use Respect\Validation\Helpers\CanValidateDateTime;
 use SilverStripe\Control\Director;
+use SilverStripe\Forms\LiteralField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
+use Sunnysideup\CmsEditLinkField\Forms\Fields\CMSEditLinkField;
+use Sunnysideup\CMSNiceties\Forms\CMSNicetiesLinkButton;
 use Sunnysideup\Ecommerce\Interfaces\BuyableModel;
 use Sunnysideup\Ecommerce\Model\Order;
 use Sunnysideup\Ecommerce\Pages\Product;
@@ -36,14 +39,14 @@ class PrepaymentHolder extends DataObject
     ];
 
     private static $has_one = [
+        'Order' => Order::class,
         'Member' => Member::class,
         'Buyable' => Product::class,
-        'Order' => Order::class,
     ];
 
     private static $summary_fields = [
         'Created' => 'Created',
-        'PrepaidAmount' => 'Prepaid Amount',
+        'PrepaidAmount.Nice' => 'Prepaid Amount',
         'Member.Email' => 'Member',
         'Buyable.Title' => 'Buyable',
     ];
@@ -52,17 +55,19 @@ class PrepaymentHolder extends DataObject
         // 'PrepaidAmount' => true,
     ];
     private static $casting = [
-        'LoginLink' => 'Varchar',
+        'LoginAndAddToCartLink' => 'Varchar',
+        'ViewOrderLink' => 'Varchar',
+        'Title' => 'Varchar',
     ];
 
     public function getLoginAndAddToCartLink(): string
     {
-        return Director::absoluteURL('/Security/login?BackURL='.$this->Product()->addLink());
+        return Director::absoluteURL('/Security/login?BackURL='.$this->Buyable()->Link());
     }
 
-    public function getOrderLink(): string
+    public function getViewOrderLink(): string
     {
-        return Director::absoluteURL('/Security/login?BackURL='.$this->Product()->addLink());
+        return Director::absoluteURL($this->Order()->Link());
     }
 
     public function canDelete($member = null)
@@ -70,8 +75,19 @@ class PrepaymentHolder extends DataObject
         return false;
     }
 
-    public function canEdit($member = null)
+    public function getCMSFields()
     {
-        return false;
+        $fields = parent::getCMSFields();
+        $fields->replaceField('OrderID', CMSEditLinkField::create('OrderID', 'Order', $this->Order()));
+        $fields->replaceField('MemberID', CMSEditLinkField::create('MemberID', 'Customer', $this->Member()));
+        $fields->replaceField('BuyableID', CMSEditLinkField::create('BuyableID', 'Product', $this->Buyable()));
+        $fields->addFieldsToTab(
+            'Root.Main',
+            [
+                CMSNicetiesLinkButton::create('LoginAndAddToCartLink', 'Login and add to Cart', $this->getLoginAndAddToCartLink(), true),
+                CMSNicetiesLinkButton::create('ViewOrderLink', 'View Order', $this->getViewOrderLink(), true),
+            ]
+        );
+        return $fields;
     }
 }

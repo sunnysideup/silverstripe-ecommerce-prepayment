@@ -21,7 +21,6 @@ class PrepaymentProductExtension extends DataExtension
 {
     private static $db = [
         'PrepaymentStatus' => 'Enum("Normal, On Presale, Post Presale Unlimited Availability", "Normal")',
-        'PrepaymentPercentage' => DBPercentage::class,
         'PrepaymentFixed' => 'Currency',
         'PrepaymentMessageWithProduct' => 'HTMLText',
     ];
@@ -42,10 +41,6 @@ class PrepaymentProductExtension extends DataExtension
             [
                 DropdownField::create('PrepaymentStatus', 'Prepayment Status', $owner->dbObject('PrepaymentStatus')->enumValues()),
                 CurrencyField::create('PrepaymentFixed', 'Prepayment Fixed Amount'),
-                NumericField::create('PrepaymentPercentage', 'Prepayment Percentage of Price')
-                    ->setScale(2),
-                DateField::create('ForSaleFrom', 'For Sale From')
-                    ->setDescription('Leave empty if you want to sell the product immediately. Products will go on sale from midnight on the specified date.'),
             ]
         );
         if($this->HasPrepaymentConditions()) {
@@ -136,8 +131,8 @@ class PrepaymentProductExtension extends DataExtension
     {
         $owner = $this->getOwner();
         $price = $owner->getCalculatedPrice();
-        if ($owner->PrepaymentPercentage || $owner->PrepaymentFixed) {
-            return (($price * $owner->PrepaymentPercentage) + $owner->PrepaymentFixed) * $quantity;
+        if ($owner->PrepaymentFixed) {
+            return $owner->PrepaymentFixed * $quantity;
         }
         return $price;
     }
@@ -187,7 +182,7 @@ class PrepaymentProductExtension extends DataExtension
      */
     public function getMemberPrepaidAmountAsMoney(): ?DBMoney
     {
-        return EcommerceCurrency::get_money_object_from_order_currency($this->getPostPresaleAmount());
+        return EcommerceCurrency::get_money_object_from_order_currency($this->getMemberPrepaidAmount());
     }
 
     /**

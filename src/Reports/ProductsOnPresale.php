@@ -1,0 +1,44 @@
+<?php
+
+namespace Sunnysideup\EcommercePrepayment\Reports;
+
+use SilverStripe\Reports\Report;
+use Sunnysideup\Ecommerce\Reports\EcommerceProductReportTrait;
+
+/**
+ * Selects all products without an image.
+ *
+ * @author: Nicolaas [at] Sunny Side Up .co.nz
+ * @package: ecommerce
+ * @sub-package: reports
+ */
+class ProductsOnPresale extends Report
+{
+    use EcommerceProductReportTrait;
+
+    protected $dataClass = PhotographicProduct::class;
+
+    /**
+     * @return int - for sorting reports
+     */
+    public function sort()
+    {
+        return 7001;
+    }
+
+    /**
+     * @return string
+     */
+    public function title()
+    {
+        return 'E-commerce: Products: on pre-sale';
+    }
+
+    /**
+     * @param mixed $params
+     */
+    protected function getEcommerceFilter($params = null): array
+    {
+        return ['PrepaymentStatus:Not' => 'Normal'];
+    }
+}
