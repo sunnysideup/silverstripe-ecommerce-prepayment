@@ -83,9 +83,9 @@ class PrepaymentAlertAvailabilityOrderStep extends OrderStep implements OrderSte
     public function doStep(Order $order): bool
     {
         foreach ($order->OrderItems() as $orderItem) {
-            /** @var Product $buyable */
-            $buyable = $orderItem->Buyable();
-            if ($buyable && $buyable->IsPostPresale()) {
+            if ($orderItem->PrepaymentStatus === 'On Presale') {
+                /** @var Product $buyable */
+                $buyable = $orderItem->Buyable();
                 $filter = ['OrderID' => $order->ID, 'BuyableID' => $buyable->ID];
                 $prepaymentHolder = PrepaymentHolder::get()->filter($filter)->first();
                 if($prepaymentHolder) {

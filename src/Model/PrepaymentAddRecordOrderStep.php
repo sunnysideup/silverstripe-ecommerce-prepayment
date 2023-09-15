@@ -70,9 +70,9 @@ class PrepaymentAddRecordOrderStep extends OrderStep implements OrderStepInterfa
     public function doStep(Order $order): bool
     {
         foreach ($order->OrderItems() as $orderItem) {
-            /** @var Product $buyable */
-            $buyable = $orderItem->Buyable();
             if ($orderItem->PrepaymentStatus === 'On Presale') {
+                /** @var Product $buyable */
+                $buyable = $orderItem->Buyable();
                 PrepaymentHolder::add_prepayment_holder(
                     $order,
                     $buyable,
@@ -80,6 +80,8 @@ class PrepaymentAddRecordOrderStep extends OrderStep implements OrderStepInterfa
                     $orderItem->CalculatedTotal
                 );
             } elseif($orderItem->PrepaymentStatus === 'Post Presale Unlimited Availability') {
+                /** @var Product $buyable */
+                $buyable = $orderItem->Buyable();
                 PrepaymentHolder::close_prepayment_holder(
                     $order,
                     $buyable,
