@@ -86,7 +86,7 @@ class PrepaymentProductExtension extends DataExtension
     {
         $owner = $this->getOwner();
         if($this->HasPrepaymentConditions()) {
-            return $owner->PrepaymentStatus !== 'On Presale';
+            return $owner->PrepaymentStatus === 'Post Presale Unlimited Availability';
         }
         return false;
     }
@@ -115,8 +115,7 @@ class PrepaymentProductExtension extends DataExtension
         $price = $owner->getCalculatedPrice();
         if($this->IsOnPresale()) {
             return $this->getPresaleAmount();
-        }
-        if($this->IsPostPresale()) {
+        } elseif($this->IsPostPresale()) {
             return $this->getPostPresaleAmountForMember();
         }
         return null;

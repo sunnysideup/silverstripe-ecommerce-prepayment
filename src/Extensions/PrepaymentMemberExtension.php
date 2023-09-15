@@ -16,9 +16,9 @@ class PrepaymentMemberExtension extends DataExtension
     {
         $owner = $this->getOwner();
         if($owner->PrepaidAmounts()->exists()) {
-            return $owner->PrepaidAmounts()->filter(['BuyableID' => $buyable->ID])->sum('PrepaidAmount');
+            return $owner->PrepaidAmounts()->filter(['BuyableID' => $buyable->ID, 'MemberID' => $owner->ID])->sum('PrepaidAmountPaid');
         }
-        return 1000;
+        return 0;
     }
 
 

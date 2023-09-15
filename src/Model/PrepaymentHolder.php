@@ -22,7 +22,7 @@ class PrepaymentHolder extends DataObject
             'OrderID' => $order->ID,
             'MemberID' => $member->ID,
             'BuyableID' => $buyable->ID,
-            'PrepaidAmount' => $amount,
+            'PrepaidAmountPaid' => $amount,
         ];
         $obj = self::get()->filter($filter)->first();
         if(! $obj) {
@@ -31,28 +31,50 @@ class PrepaymentHolder extends DataObject
         $obj->write();
         return $obj;
     }
+    public static function close_prepayment_holder(Order $order, BuyableModel $buyable, Member $member, float $amount)
+    {
+
+        $filter = [
+            'MemberID' => $member->ID,
+            'BuyableID' => $buyable->ID,
+        ];
+        $obj = self::get()->filter($filter)->first();
+        if(! $obj) {
+            $obj = self::add_prepayment_holder($order, $buyable, $member, $amount);
+            $obj->Note = 'Error';
+        }
+        $obj->ClosingOrderID = $order->ID;
+        $obj->Completed = true;
+        $obj->ClosingAmountPaid = $amount;
+        $obj->write();
+        return $obj;
+    }
 
     private static $table_name = 'PrepaymentHolder';
     private static $db = [
-        'PrepaidAmount' => 'Currency',
+        'PrepaidAmountPaid' => 'Currency',
+        'ClosingAmountPaid' => 'Currency',
         'Completed' => 'Boolean',
+        'Note' => 'Varchar',
     ];
 
     private static $has_one = [
         'Order' => Order::class,
+        'ClosingOrder' => Order::class,
         'Member' => Member::class,
         'Buyable' => Product::class,
     ];
 
     private static $summary_fields = [
         'Created' => 'Created',
-        'PrepaidAmount.Nice' => 'Prepaid Amount',
+        'PrepaidAmountPaid.Nice' => 'Prepaid Amount',
         'Member.Email' => 'Member',
         'Buyable.Title' => 'Buyable',
     ];
 
     private static $indexes = [
-        // 'PrepaidAmount' => true,
+        'PrepaidAmountPaid' => true,
+        'Completed' => true,
     ];
     private static $casting = [
         'LoginAndAddToCartLink' => 'Varchar',
@@ -70,6 +92,11 @@ class PrepaymentHolder extends DataObject
         return Director::absoluteURL($this->Order()->Link());
     }
 
+    public function getClosingViewOrderLink(): string
+    {
+        return Director::absoluteURL($this->Order()->Link());
+    }
+
     public function canDelete($member = null)
     {
         return false;
@@ -81,13 +108,16 @@ class PrepaymentHolder extends DataObject
         $fields->replaceField('OrderID', CMSEditLinkField::create('OrderID', 'Order', $this->Order()));
         $fields->replaceField('MemberID', CMSEditLinkField::create('MemberID', 'Customer', $this->Member()));
         $fields->replaceField('BuyableID', CMSEditLinkField::create('BuyableID', 'Product', $this->Buyable()));
+        $fields->replaceField('ClosingOrderID', CMSEditLinkField::create('ClosingOrderID', 'Completion Order', $this->ClosingOrder()));
         $fields->addFieldsToTab(
             'Root.Main',
             [
                 CMSNicetiesLinkButton::create('LoginAndAddToCartLink', 'Login and add to Cart', $this->getLoginAndAddToCartLink(), true),
                 CMSNicetiesLinkButton::create('ViewOrderLink', 'View Order', $this->getViewOrderLink(), true),
+                CMSNicetiesLinkButton::create('ViewClosingOrderLink', 'View Closing Order', $this->getClosingViewOrderLink(), true),
             ]
         );
         return $fields;
     }
+
 }

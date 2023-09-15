@@ -98,7 +98,7 @@ class PrepaymentAlertAvailabilityOrderStep extends OrderStep implements OrderSte
                 }
             }
         }
-        return true;
+        return false;
     }
 
     /**
