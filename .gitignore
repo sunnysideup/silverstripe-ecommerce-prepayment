@@ -1,12 +1,26 @@
+# funny files
+_ss_environment.php
+db.sql
 .sass-cache
 .DS_Store
 npm-debug.log
-/.buildpath
-/.project
-/.settings
-css/GridField_print.css
-admin/thirdparty/chosen/node_modules
-node_modules/
-coverage/
-/**/*.js.map
+.buildpath
+.project
+.settings
+.ddev
+.env
+release.log
+
+# excluded dirs
+/silverstripe-cache
 /vendor
+/public/assets/
+/public/resources/
+/public/_resources/
+/public/cache/
+/public/offline/
+.graphql-generated/
+/public/_graphql
+
+# excluded themes
+/themes/sswebpack_engine_only
