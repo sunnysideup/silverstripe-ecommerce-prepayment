@@ -1,5 +1,5 @@
 {
-  "name": "sunnysideup/ecommerce-prepayment",
+  "name": "sunnysideup/ecommerce-demo",
   "type": "silverstripe-vendormodule",
   "description": "Allows Silverstripe-CMS Ecommerce to get customers to prepay for a product.",
   "keywords": [
@@ -27,6 +27,12 @@
   "autoload": {
     "psr-4": {
       "Sunnysideup\\EcommercePrepayment\\": "src/"
+    }
+  },
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {
+      "silverstripe/vendor-plugin": true
     }
   }
 }
