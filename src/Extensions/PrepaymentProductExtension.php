@@ -13,8 +13,11 @@ use SilverStripe\Forms\NumericField;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\FieldType\DBMoney;
 use SilverStripe\ORM\FieldType\DBPercentage;
+use SilverStripe\Security\Member;
 use SilverStripe\Security\Security;
+use Sunnysideup\Ecommerce\Api\ShoppingCart;
 use Sunnysideup\Ecommerce\Model\Money\EcommerceCurrency;
+use Sunnysideup\Ecommerce\Model\Order;
 use Sunnysideup\EcommercePrepayment\Model\PrepaymentHolder;
 
 class PrepaymentProductExtension extends DataExtension
@@ -96,8 +99,20 @@ class PrepaymentProductExtension extends DataExtension
     {
         $owner = $this->getOwner();
         $member = Security::getCurrentUser();
+        if(! $member) {
+            $order = ShoppingCart::current_order();
+            if($order) {
+                if($order->MemberID) {
+                    $member = $order->Member();
+                }
+                if(! $member) {
+                    $email = $order->BillingAddress()->Email;
+                    $member = Member::get()->filter(['Email' => $email])->first();
+                }
+            }
+        }
         if ($member) {
-            return (float) $member->getPrepaidAmount($owner);
+            return (float) $member->getPrepaidAmount($owner, ShoppingCart::current_order());
         }
 
         return (float) 0;

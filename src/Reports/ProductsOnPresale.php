@@ -3,6 +3,7 @@
 namespace Sunnysideup\EcommercePrepayment\Reports;
 
 use SilverStripe\Reports\Report;
+use Sunnysideup\Ecommerce\Pages\Product;
 use Sunnysideup\Ecommerce\Reports\EcommerceProductReportTrait;
 
 /**
@@ -16,7 +17,7 @@ class ProductsOnPresale extends Report
 {
     use EcommerceProductReportTrait;
 
-    protected $dataClass = PhotographicProduct::class;
+    protected $dataClass = Product::class;
 
     /**
      * @return int - for sorting reports
