@@ -42,7 +42,8 @@ class PrepaymentProductExtension extends DataExtension
         $fields->addFieldsToTab(
             'Root.Price',
             [
-                DropdownField::create('PrepaymentStatus', 'Prepayment Status', $owner->dbObject('PrepaymentStatus')->enumValues()),
+                DropdownField::create('PrepaymentStatus', 'Prepayment Status', $owner->dbObject('PrepaymentStatus')->enumValues())
+                    ->setDescription('It is important that, when you take a product off Presale, you select the Post Presale option so that people with Presale can purchase the product with a discount if they have pre-paid.'),
                 CurrencyField::create('PrepaymentFixed', 'Prepayment Fixed Amount'),
             ]
         );
