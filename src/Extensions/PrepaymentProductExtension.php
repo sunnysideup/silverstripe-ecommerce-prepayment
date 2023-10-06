@@ -40,7 +40,7 @@ class PrepaymentProductExtension extends DataExtension
     {
         $owner = $this->getOwner();
         $fields->addFieldsToTab(
-            'Root.Price',
+            'Root.PrePayment',
             [
                 DropdownField::create('PrepaymentStatus', 'Prepayment Status', $owner->dbObject('PrepaymentStatus')->enumValues())
                     ->setDescription('It is important that, when you take a product off Presale, you select the Post Presale option so that people with Presale can purchase the product with a discount if they have pre-paid.'),
@@ -49,7 +49,7 @@ class PrepaymentProductExtension extends DataExtension
         );
         if($this->HasPrepaymentConditions()) {
             $fields->addFieldsToTab(
-                'Root.Price',
+                'Root.PrePayment',
                 [
                     HTMLEditorField::create('PrepaymentMessageWithProduct', 'Generic Prepayment Message')
                         ->setDescription('This message will be shown on all products that have a prepayment percentage set and are not yet for sale proper.'),
