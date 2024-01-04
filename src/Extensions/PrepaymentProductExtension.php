@@ -23,10 +23,17 @@ use Sunnysideup\EcommercePrepayment\Model\PrepaymentHolder;
 class PrepaymentProductExtension extends DataExtension
 {
     public const PREPAYMENT_STATUS_NORMAL = 'Normal';
+
     public const PREPAYMENT_STATUS_ON_PRESALE = 'On Presale';
+
     public const PREPAYMENT_STATUS_POST_PRESALE = 'Post Presale Unlimited Availability';
+
     private static $db = [
-        'PrepaymentStatus' => 'Enum("' . self::PREPAYMENT_STATUS_NORMAL . ',' . self::PREPAYMENT_STATUS_ON_PRESALE . ', ' . self::PREPAYMENT_STATUS_POST_PRESALE . '", "' . self::PREPAYMENT_STATUS_NORMAL . '")',
+        'PrepaymentStatus' => 'Enum("' .
+            self::PREPAYMENT_STATUS_NORMAL . ',' .
+            self::PREPAYMENT_STATUS_ON_PRESALE . ', ' .
+            self::PREPAYMENT_STATUS_POST_PRESALE . '", "' .
+            self::PREPAYMENT_STATUS_NORMAL . '")',
         'PrepaymentFixed' => 'Currency',
         'PrepaymentMessageWithProduct' => 'HTMLText',
     ];

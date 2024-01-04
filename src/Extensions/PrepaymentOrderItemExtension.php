@@ -13,8 +13,8 @@ class PrepaymentOrderItemExtension extends DataExtension
         'PrepaymentStatus' => 'Enum("' .
             PrepaymentProductExtension::PREPAYMENT_STATUS_NORMAL . ',' .
             PrepaymentProductExtension::PREPAYMENT_STATUS_ON_PRESALE . ', ' .
-            PrepaymentProductExtension::PREPAYMENT_STATUS_POST_PRESALE . '",
-            "' . PrepaymentProductExtension::PREPAYMENT_STATUS_NORMAL . '")',
+            PrepaymentProductExtension::PREPAYMENT_STATUS_POST_PRESALE . '", "' .
+            PrepaymentProductExtension::PREPAYMENT_STATUS_NORMAL . '")',
     ];
 
     public function updateSubTableTitle($title)
