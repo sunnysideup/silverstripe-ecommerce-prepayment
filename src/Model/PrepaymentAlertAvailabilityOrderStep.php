@@ -14,6 +14,7 @@ use Sunnysideup\Ecommerce\Model\Config\EcommerceDBConfig;
 use Sunnysideup\Ecommerce\Model\Order;
 use Sunnysideup\Ecommerce\Model\Process\OrderStep;
 use Sunnysideup\Ecommerce\Pages\Product;
+use Sunnysideup\EcommercePrepayment\Extensions\PrepaymentProductExtension;
 
 /**
  *
@@ -83,7 +84,7 @@ class PrepaymentAlertAvailabilityOrderStep extends OrderStep implements OrderSte
     public function doStep(Order $order): bool
     {
         foreach ($order->OrderItems() as $orderItem) {
-            if ($orderItem->PrepaymentStatus === 'On Presale') {
+            if ($orderItem->PrepaymentStatus === PrepaymentProductExtension::PREPAYMENT_STATUS_ON_PRESALE) {
                 /** @var Product $buyable */
                 $buyable = $orderItem->Buyable();
                 $filter = ['OrderID' => $order->ID, 'BuyableID' => $buyable->ID];

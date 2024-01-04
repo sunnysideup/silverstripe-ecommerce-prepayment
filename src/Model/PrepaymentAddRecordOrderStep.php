@@ -9,6 +9,7 @@ use Sunnysideup\Ecommerce\Interfaces\OrderStepInterface;
 use Sunnysideup\Ecommerce\Model\Order;
 use Sunnysideup\Ecommerce\Model\Process\OrderStep;
 use Sunnysideup\Ecommerce\Pages\Product;
+use Sunnysideup\EcommercePrepayment\Extensions\PrepaymentProductExtension;
 
 /**
  *
@@ -70,7 +71,7 @@ class PrepaymentAddRecordOrderStep extends OrderStep implements OrderStepInterfa
     public function doStep(Order $order): bool
     {
         foreach ($order->OrderItems() as $orderItem) {
-            if ($orderItem->PrepaymentStatus === 'On Presale') {
+            if ($orderItem->PrepaymentStatus === PrepaymentProductExtension::PREPAYMENT_STATUS_ON_PRESALE) {
                 /** @var Product $buyable */
                 $buyable = $orderItem->Buyable();
                 PrepaymentHolder::add_prepayment_holder(
@@ -79,7 +80,7 @@ class PrepaymentAddRecordOrderStep extends OrderStep implements OrderStepInterfa
                     $order->Member(),
                     $orderItem->CalculatedTotal
                 );
-            } elseif($orderItem->PrepaymentStatus === 'Post Presale Unlimited Availability') {
+            } elseif($orderItem->PrepaymentStatus === PrepaymentProductExtension::PREPAYMENT_STATUS_POST_PRESALE) {
                 /** @var Product $buyable */
                 $buyable = $orderItem->Buyable();
                 PrepaymentHolder::close_prepayment_holder(

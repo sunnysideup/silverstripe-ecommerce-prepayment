@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommercePrepayment\Extensions;
 
+use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataExtension;
@@ -9,7 +10,11 @@ use SilverStripe\ORM\DataExtension;
 class PrepaymentOrderItemExtension extends DataExtension
 {
     private static $db = [
-        'PrepaymentStatus' => 'Enum("Normal, On Presale, Post Presale Unlimited Availability", "Normal")',
+        'PrepaymentStatus' => 'Enum("' .
+            PrepaymentProductExtension::PREPAYMENT_STATUS_NORMAL . ',' .
+            PrepaymentProductExtension::PREPAYMENT_STATUS_ON_PRESALE . ', ' .
+            PrepaymentProductExtension::PREPAYMENT_STATUS_POST_PRESALE . '",
+            "' . PrepaymentProductExtension::PREPAYMENT_STATUS_NORMAL . '")',
     ];
 
     public function updateSubTableTitle($title)
@@ -22,14 +27,14 @@ class PrepaymentOrderItemExtension extends DataExtension
                 $remainingAmountAsMoney = $product->getPostPresaleAmountAsMoney($owner->Quantity);
                 return '
                     <strong>Prepayment only.
-                    Full price is '.$fullPriceAsMoney->Nice(). ' per item.
-                    <br />Remaining amount to be paid on arrival is '.$remainingAmountAsMoney->Nice().'.</strong>';
+                    Full price is ' . $fullPriceAsMoney->Nice() . ' per item.
+                    <br />Remaining amount to be paid on arrival is ' . $remainingAmountAsMoney->Nice() . '.</strong>';
             } elseif($product->IsPostPresale()) {
                 $amount = $product->getNextAmountForMember();
                 if((float) $amount !== (float) 0) {
                     $fullPriceAsMoney = $product->CalculatedPriceAsMoney();
                     $memberPrepaidAmount = $product->getMemberPrepaidAmountAsMoney();
-                    return '<strong>Prepayment of '.$memberPrepaidAmount->Nice().' deducted from the full price of '.$fullPriceAsMoney->Nice().'.</strong>';
+                    return '<strong>Prepayment of ' . $memberPrepaidAmount->Nice() . ' deducted from the full price of ' . $fullPriceAsMoney->Nice() . '.</strong>';
 
                 }
             }
@@ -42,7 +47,7 @@ class PrepaymentOrderItemExtension extends DataExtension
         $fields->addFieldsToTab(
             'Root.Main',
             [
-                ReadonlyField::create('PrepaymentStatus', 'Prepayment Status', SiteTree::class),
+                ReadonlyField::create('PrepaymentStatus', 'Prepayment Status'),
             ]
         );
     }

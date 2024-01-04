@@ -5,6 +5,7 @@ namespace Sunnysideup\EcommercePrepayment\Reports;
 use SilverStripe\Reports\Report;
 use Sunnysideup\Ecommerce\Pages\Product;
 use Sunnysideup\Ecommerce\Reports\EcommerceProductReportTrait;
+use Sunnysideup\EcommercePrepayment\Extensions\PrepaymentProductExtension;
 
 /**
  * Selects all products without an image.
@@ -40,6 +41,6 @@ class ProductsOnPresale extends Report
      */
     protected function getEcommerceFilter($params = null): array
     {
-        return ['PrepaymentStatus:Not' => 'Normal'];
+        return ['PrepaymentStatus:Not' => PrepaymentProductExtension::PREPAYMENT_STATUS_NORMAL];
     }
 }

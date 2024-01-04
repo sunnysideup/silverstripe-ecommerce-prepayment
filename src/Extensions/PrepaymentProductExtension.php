@@ -22,8 +22,11 @@ use Sunnysideup\EcommercePrepayment\Model\PrepaymentHolder;
 
 class PrepaymentProductExtension extends DataExtension
 {
+    public const PREPAYMENT_STATUS_NORMAL = 'Normal';
+    public const PREPAYMENT_STATUS_ON_PRESALE = 'On Presale';
+    public const PREPAYMENT_STATUS_POST_PRESALE = 'Post Presale Unlimited Availability';
     private static $db = [
-        'PrepaymentStatus' => 'Enum("Normal, On Presale, Post Presale Unlimited Availability", "Normal")',
+        'PrepaymentStatus' => 'Enum("' . self::PREPAYMENT_STATUS_NORMAL . ',' . self::PREPAYMENT_STATUS_ON_PRESALE . ', ' . self::PREPAYMENT_STATUS_POST_PRESALE . '", "' . self::PREPAYMENT_STATUS_NORMAL . '")',
         'PrepaymentFixed' => 'Currency',
         'PrepaymentMessageWithProduct' => 'HTMLText',
     ];
@@ -72,14 +75,14 @@ class PrepaymentProductExtension extends DataExtension
             return false;
         }
 
-        return $owner->PrepaymentStatus !== 'Normal';
+        return $owner->PrepaymentStatus !== PrepaymentProductExtension::PREPAYMENT_STATUS_NORMAL;
     }
 
     public function IsOnPresale(): bool
     {
         $owner = $this->getOwner();
         if($this->HasPrepaymentConditions()) {
-            return $owner->PrepaymentStatus === 'On Presale';
+            return $owner->PrepaymentStatus === PrepaymentProductExtension::PREPAYMENT_STATUS_ON_PRESALE;
 
         }
 
@@ -90,7 +93,7 @@ class PrepaymentProductExtension extends DataExtension
     {
         $owner = $this->getOwner();
         if($this->HasPrepaymentConditions()) {
-            return $owner->PrepaymentStatus === 'Post Presale Unlimited Availability';
+            return $owner->PrepaymentStatus === PrepaymentProductExtension::PREPAYMENT_STATUS_POST_PRESALE;
         }
         return false;
     }
