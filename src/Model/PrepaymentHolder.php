@@ -82,9 +82,14 @@ class PrepaymentHolder extends DataObject
         'Title' => 'Varchar',
     ];
 
+    public function Product()
+    {
+        return $this->Buyable();
+    }
+
     public function getLoginAndAddToCartLink(): string
     {
-        return Director::absoluteURL('/Security/login?BackURL='.$this->Buyable()->Link());
+        return Director::absoluteURL('/Security/login?BackURL=' . $this->Buyable()->Link());
     }
 
     public function getViewOrderLink(): string
