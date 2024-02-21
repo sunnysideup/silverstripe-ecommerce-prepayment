@@ -146,12 +146,12 @@ class PrepaymentAlertAvailabilityOrderStep extends OrderStep implements OrderSte
                 'LoginLink' => $loginLink,
             ];
             $themeEnabled = Config::inst()->get(SSViewer::class, 'theme_enabled');
-            SSViewer::config()->merge('theme_enabled', true);
+            SSViewer::config()->set('theme_enabled', true);
             $message = $this->renderWith(
                 self::class,
                 $renderWithArray
             );
-            SSViewer::config()->merge('theme_enabled', $themeEnabled);
+            SSViewer::config()->set('theme_enabled', $themeEnabled);
             $adminOnlyOrToEmail = ! (bool) $this->SendMessageToCustomer;
 
             $outcome = (bool) $this->sendEmailForStep(
