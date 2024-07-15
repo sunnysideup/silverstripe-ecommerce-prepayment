@@ -56,7 +56,7 @@ class PrepaymentOrderItemExtension extends DataExtension
     {
         $owner = $this->getOwner();
         $product = $owner->Product();
-        if($product->IsOnPresale() || $product->IsPostPresale()) {
+        if($product && ($product->IsOnPresale() || $product->IsPostPresale())) {
             return $product->getNextAmountForMember();
         }
         return null;
