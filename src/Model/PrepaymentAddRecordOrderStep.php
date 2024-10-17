@@ -80,7 +80,7 @@ class PrepaymentAddRecordOrderStep extends OrderStep implements OrderStepInterfa
                     $order->Member(),
                     $orderItem->CalculatedTotal
                 );
-            } elseif($orderItem->PrepaymentStatus === PrepaymentProductExtension::PREPAYMENT_STATUS_POST_PRESALE) {
+            } elseif ($orderItem->PrepaymentStatus === PrepaymentProductExtension::PREPAYMENT_STATUS_POST_PRESALE) {
                 /** @var Product $buyable */
                 $buyable = $orderItem->Buyable();
                 PrepaymentHolder::close_prepayment_holder(
@@ -95,8 +95,8 @@ class PrepaymentAddRecordOrderStep extends OrderStep implements OrderStepInterfa
 
         return (bool) $this->sendEmailForStep(
             $order,
-            $subject = $this->EmailSubject,
-            $message = $this->CustomerMessage,
+            (string) $subject = $this->EmailSubject,
+            (string) $message = $this->CustomerMessage,
             $resend = false,
             $adminOnlyOrToEmail,
             $this->getEmailClassName()

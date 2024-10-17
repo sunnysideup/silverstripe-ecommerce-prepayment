@@ -89,9 +89,9 @@ class PrepaymentAlertAvailabilityOrderStep extends OrderStep implements OrderSte
                 $buyable = $orderItem->Buyable();
                 $filter = ['OrderID' => $order->ID, 'BuyableID' => $buyable->ID];
                 $prepaymentHolder = PrepaymentHolder::get()->filter($filter)->first();
-                if($prepaymentHolder) {
+                if ($prepaymentHolder) {
 
-                    if(!$this->sendNotifications($order, $prepaymentHolder)) {
+                    if (!$this->sendNotifications($order, $prepaymentHolder)) {
                         return false;
                     }
                 } else {
@@ -156,13 +156,13 @@ class PrepaymentAlertAvailabilityOrderStep extends OrderStep implements OrderSte
 
             $outcome = (bool) $this->sendEmailForStep(
                 $order,
-                $this->EmailSubject,
-                $message,
+                (string) $this->EmailSubject,
+                (string) $message,
                 $resend = false,
                 $adminOnlyOrToEmail,
                 $this->getEmailClassName()
             );
-            if(! $outcome) {
+            if (! $outcome) {
                 return false;
             }
         } else {
