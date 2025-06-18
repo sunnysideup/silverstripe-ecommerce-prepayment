@@ -13,7 +13,7 @@
     </tr>
     <tr>
       <td align="center">
-        <p>Please <a href="$LoginLink">finalise the purchase</a> of $Product.Title.</p>
+        <p>Please <a href="$LoginLink">finalise the purchase</a> of $ProductTitle.</p>
       </td>
     </tr>
   </table>

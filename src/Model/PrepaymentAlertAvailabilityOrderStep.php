@@ -140,7 +140,7 @@ class PrepaymentAlertAvailabilityOrderStep extends OrderStep implements OrderSte
         $loginLink = $prepaymentHolder->getLoginAndAddToCartLink();
         if ($product && $member) {
             $renderWithArray = [
-                'Product' => $product,
+                'ProductTitle' => $product->Title,
                 'Message' => $this->CustomerMessage,
                 'Member' => $member,
                 'LoginLink' => $loginLink,
@@ -148,7 +148,7 @@ class PrepaymentAlertAvailabilityOrderStep extends OrderStep implements OrderSte
             $themeEnabled = Config::inst()->get(SSViewer::class, 'theme_enabled');
             SSViewer::config()->set('theme_enabled', true);
             $message = $this->renderWith(
-                self::class,
+                'Sunnysideup\\EcommercePrepayment\\Model\\PrepaymentMessage',
                 $renderWithArray
             );
             SSViewer::config()->set('theme_enabled', $themeEnabled);
