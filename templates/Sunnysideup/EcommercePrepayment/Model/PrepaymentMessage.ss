@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>Prepayment update</title>
+  <meta name="robots" content="noindex, nofollow">
 </head>
 <body>
   <table width="600" cellpadding="0" cellspacing="0">
