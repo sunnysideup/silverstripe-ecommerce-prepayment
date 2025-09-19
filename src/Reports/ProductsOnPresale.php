@@ -3,6 +3,7 @@
 namespace Sunnysideup\EcommercePrepayment\Reports;
 
 use SilverStripe\Reports\Report;
+use Sunnysideup\Ecommerce\Model\Process\OrderStep;
 use Sunnysideup\Ecommerce\Pages\Product;
 use Sunnysideup\Ecommerce\Reports\EcommerceProductReportTrait;
 use Sunnysideup\EcommercePrepayment\Extensions\PrepaymentProductExtension;
@@ -42,5 +43,13 @@ class ProductsOnPresale extends Report
     protected function getEcommerceFilter($params = null): array
     {
         return ['PrepaymentStatus:Not' => PrepaymentProductExtension::PREPAYMENT_STATUS_NORMAL];
+    }
+
+    public function updateEcommerceReportColumns(array $columns): array
+    {
+        $columns['PrepaymentStatus'] = 'Pre-Sale Status';
+        $columns['SoldCount'] = 'Sold';
+
+        return $columns;
     }
 }
