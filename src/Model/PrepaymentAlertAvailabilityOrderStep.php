@@ -10,7 +10,6 @@ use SilverStripe\Forms\TextField;
 use SilverStripe\View\SSViewer;
 use Sunnysideup\Ecommerce\Email\OrderStatusEmail;
 use Sunnysideup\Ecommerce\Interfaces\OrderStepInterface;
-use Sunnysideup\Ecommerce\Model\Config\EcommerceDBConfig;
 use Sunnysideup\Ecommerce\Model\Order;
 use Sunnysideup\Ecommerce\Model\Process\OrderStep;
 use Sunnysideup\Ecommerce\Pages\Product;
@@ -99,6 +98,7 @@ class PrepaymentAlertAvailabilityOrderStep extends OrderStep implements OrderSte
                 }
             }
         }
+
         return true;
     }
 

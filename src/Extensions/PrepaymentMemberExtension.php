@@ -2,11 +2,11 @@
 
 namespace Sunnysideup\EcommercePrepayment\Extensions;
 
-use SilverStripe\ORM\DataExtension;
+use SilverStripe\Core\Extension;
 use Sunnysideup\Ecommerce\Interfaces\BuyableModel;
 use Sunnysideup\EcommercePrepayment\Model\PrepaymentHolder;
 
-class PrepaymentMemberExtension extends DataExtension
+class PrepaymentMemberExtension extends Extension
 {
     private static $has_many = [
         'PrepaidAmounts' => PrepaymentHolder::class,
@@ -18,6 +18,7 @@ class PrepaymentMemberExtension extends DataExtension
         if($owner->PrepaidAmounts()->exists()) {
             return $owner->PrepaidAmounts()->filter(['BuyableID' => $buyable->ID, 'MemberID' => $owner->ID])->sum('PrepaidAmountPaid');
         }
+
         return 0;
     }
 

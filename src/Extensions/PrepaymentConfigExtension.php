@@ -2,11 +2,11 @@
 
 namespace Sunnysideup\EcommercePrepayment\Extensions;
 
+use SilverStripe\Core\Extension;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
-use SilverStripe\ORM\DataExtension;
 
-class PrepaymentConfigExtension extends DataExtension
+class PrepaymentConfigExtension extends Extension
 {
     private static $db = [
         'PrepaymentMessageWithProduct' => 'HTMLText',

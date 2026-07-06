@@ -91,6 +91,7 @@ class PrepaymentAddRecordOrderStep extends OrderStep implements OrderStepInterfa
                 );
             }
         }
+
         $adminOnlyOrToEmail = ! (bool) $this->SendMessageToCustomer;
 
         return (bool) $this->sendEmailForStep(

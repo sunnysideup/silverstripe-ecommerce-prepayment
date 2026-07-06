@@ -2,12 +2,11 @@
 
 namespace Sunnysideup\EcommercePrepayment\Extensions;
 
-use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\Core\Extension;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
-use SilverStripe\ORM\DataExtension;
 
-class PrepaymentOrderItemExtension extends DataExtension
+class PrepaymentOrderItemExtension extends Extension
 {
     private static $db = [
         'PrepaymentStatus' => 'Enum("' .
@@ -39,6 +38,7 @@ class PrepaymentOrderItemExtension extends DataExtension
                 }
             }
         }
+
         return null;
     }
 
@@ -59,6 +59,7 @@ class PrepaymentOrderItemExtension extends DataExtension
         if($product && ($product->IsOnPresale() || $product->IsPostPresale())) {
             return $product->getNextAmountForMember();
         }
+
         return null;
     }
 
@@ -68,19 +69,23 @@ class PrepaymentOrderItemExtension extends DataExtension
         if($owner->ID !== $orderItem->ID) {
             user_error('ID Mismatch');
         }
+
         $write = false;
         $product = $owner->Product();
         if($product) {
             if($product->IsOnPresale()) {
-                if((bool) $owner->HasPhysicalDispatch !== false) {
+                if((bool) $owner->HasPhysicalDispatch) {
                     $write = true;
                 }
+
                 $owner->HasPhysicalDispatch = false;
             }
+
             if($product->PrepaymentStatus !== $orderItem->PrepaymentStatus) {
                 $owner->PrepaymentStatus = $product->PrepaymentStatus;
                 $write = true;
             }
+
             if($write) {
                 $owner->write();
             }

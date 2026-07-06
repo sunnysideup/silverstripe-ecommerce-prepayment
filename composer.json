@@ -1,38 +1,39 @@
 {
-  "name": "sunnysideup/ecommerce-demo",
-  "type": "silverstripe-vendormodule",
-  "description": "Allows Silverstripe-CMS Ecommerce to get customers to prepay for a product.",
-  "keywords": [
-    "Silverstripe-CMS",
-    "CMS",
-    "Silverstripe",
-    "ecommerce",
-    "e-commerce",
-    "prepay",
-    "pre-pay",
-    "preorder",
-    "pre-order"
-  ],
-  "license": "BSD-3-Clause",
-  "authors": [
-    {
-      "name": "Nicolaas Francken",
-      "email": "modules@sunnysideup.co.nz",
-      "role": "lead developer"
+    "name": "sunnysideup/ecommerce-demo",
+    "type": "silverstripe-vendormodule",
+    "description": "Allows Silverstripe-CMS Ecommerce to get customers to prepay for a product.",
+    "keywords": [
+        "Silverstripe-CMS",
+        "CMS",
+        "Silverstripe",
+        "ecommerce",
+        "e-commerce",
+        "prepay",
+        "pre-pay",
+        "preorder",
+        "pre-order"
+    ],
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Nicolaas Francken",
+            "email": "modules@sunnysideup.co.nz",
+            "role": "lead developer"
+        }
+    ],
+    "require": {
+        "silverstripe/framework": "^6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Sunnysideup\\EcommercePrepayment\\": "src/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "silverstripe/vendor-plugin": true,
+            "composer/installers": true
+        }
     }
-  ],
-  "require": {
-    "silverstripe/framework": "~4.0 || ~5.0"
-  },
-  "autoload": {
-    "psr-4": {
-      "Sunnysideup\\EcommercePrepayment\\": "src/"
-    }
-  },
-  "config": {
-    "sort-packages": true,
-    "allow-plugins": {
-      "silverstripe/vendor-plugin": true
-    }
-  }
 }
