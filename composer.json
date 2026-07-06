@@ -34,9 +34,6 @@
         "allow-plugins": {
             "silverstripe/vendor-plugin": true,
             "composer/installers": true
-        },
-        "audit": {
-            "block-insecure": false
         }
     }
 }
