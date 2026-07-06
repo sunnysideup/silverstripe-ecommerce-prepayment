@@ -2,25 +2,21 @@
 
 namespace Sunnysideup\EcommercePrepayment\Extensions;
 
+use SilverStripe\Core\Extension;
 use SilverStripe\Forms\CurrencyField;
-use SilverStripe\Forms\DateField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordViewer;
 use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
-use SilverStripe\Forms\NumericField;
-use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\FieldType\DBMoney;
-use SilverStripe\ORM\FieldType\DBPercentage;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Security;
 use Sunnysideup\Ecommerce\Api\ShoppingCart;
 use Sunnysideup\Ecommerce\Model\Money\EcommerceCurrency;
-use Sunnysideup\Ecommerce\Model\Order;
 use Sunnysideup\EcommercePrepayment\Model\PrepaymentHolder;
 
-class PrepaymentProductExtension extends DataExtension
+class PrepaymentProductExtension extends Extension
 {
     public const PREPAYMENT_STATUS_NORMAL = 'Normal';
 
@@ -102,6 +98,7 @@ class PrepaymentProductExtension extends DataExtension
         if($this->HasPrepaymentConditions()) {
             return $owner->PrepaymentStatus === PrepaymentProductExtension::PREPAYMENT_STATUS_POST_PRESALE;
         }
+
         return false;
     }
 
@@ -116,12 +113,14 @@ class PrepaymentProductExtension extends DataExtension
                 if($order->MemberID) {
                     $member = $order->Member();
                 }
+
                 if(! $member) {
                     $email = $order->BillingAddress()->Email;
                     $member = Member::get()->filter(['Email' => $email])->first();
                 }
             }
         }
+
         if ($member) {
             return (float) $member->getPrepaidAmount($owner, ShoppingCart::current_order());
         }
@@ -144,6 +143,7 @@ class PrepaymentProductExtension extends DataExtension
         } elseif($this->IsPostPresale()) {
             return $this->getPostPresaleAmountForMember();
         }
+
         return null;
     }
 
@@ -159,6 +159,7 @@ class PrepaymentProductExtension extends DataExtension
         if ($owner->PrepaymentFixed) {
             return $owner->PrepaymentFixed * $quantity;
         }
+
         return $price;
     }
 
@@ -187,6 +188,7 @@ class PrepaymentProductExtension extends DataExtension
         if($prepaidAmount) {
             return $price - $prepaidAmount;
         }
+
         return null;
     }
 

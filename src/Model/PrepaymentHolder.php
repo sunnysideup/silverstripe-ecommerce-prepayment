@@ -2,9 +2,7 @@
 
 namespace Sunnysideup\EcommercePrepayment\Model;
 
-use Respect\Validation\Helpers\CanValidateDateTime;
 use SilverStripe\Control\Director;
-use SilverStripe\Forms\LiteralField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
 use Sunnysideup\CmsEditLinkField\Forms\Fields\CMSEditLinkField;
@@ -28,9 +26,11 @@ class PrepaymentHolder extends DataObject
         if(! $obj) {
             $obj = self::create($filter);
         }
+
         $obj->write();
         return $obj;
     }
+
     public static function close_prepayment_holder(Order $order, BuyableModel $buyable, Member $member, float $amount)
     {
 
@@ -43,6 +43,7 @@ class PrepaymentHolder extends DataObject
             $obj = self::add_prepayment_holder($order, $buyable, $member, $amount);
             $obj->Note = 'Error';
         }
+
         $obj->ClosingOrderID = $order->ID;
         $obj->Completed = true;
         $obj->ClosingAmountPaid = $amount;
@@ -51,6 +52,7 @@ class PrepaymentHolder extends DataObject
     }
 
     private static $table_name = 'PrepaymentHolder';
+
     private static $db = [
         'PrepaidAmountPaid' => 'Currency',
         'ClosingAmountPaid' => 'Currency',
@@ -76,6 +78,7 @@ class PrepaymentHolder extends DataObject
         'PrepaidAmountPaid' => true,
         'Completed' => true,
     ];
+
     private static $casting = [
         'LoginAndAddToCartLink' => 'Varchar',
         'ViewOrderLink' => 'Varchar',

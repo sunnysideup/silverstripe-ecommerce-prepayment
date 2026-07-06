@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sunnysideup\EcommercePrepayment\Reports;
 
 use SilverStripe\Reports\Report;
-use Sunnysideup\Ecommerce\Model\Process\OrderStep;
 use Sunnysideup\Ecommerce\Pages\Product;
 use Sunnysideup\Ecommerce\Reports\EcommerceProductReportTrait;
 use Sunnysideup\EcommercePrepayment\Extensions\PrepaymentProductExtension;
