@@ -34,19 +34,36 @@ class PrepaymentHolder extends DataObject
     public static function close_prepayment_holder(Order $order, BuyableModel $buyable, Member $member, float $amount)
     {
 
+        // close every open holder for this customer and product, so that none of the credit can be used again.
         $filter = [
             'MemberID' => $member->ID,
             'BuyableID' => $buyable->ID,
+            'Completed' => false,
         ];
-        $obj = self::get()->filter($filter)->first();
-        if(! $obj) {
+        $holders = self::get()->filter($filter);
+        $obj = null;
+        if (! $holders->exists()) {
             $obj = self::add_prepayment_holder($order, $buyable, $member, $amount);
             $obj->Note = 'Error';
+            $obj->ClosingOrderID = $order->ID;
+            $obj->Completed = true;
+            $obj->ClosingAmountPaid = $amount;
+            $obj->write();
+
+            return $obj;
         }
-        $obj->ClosingOrderID = $order->ID;
-        $obj->Completed = true;
-        $obj->ClosingAmountPaid = $amount;
-        $obj->write();
+        foreach ($holders as $holder) {
+            $holder->ClosingOrderID = $order->ID;
+            $holder->Completed = true;
+            if (null === $obj) {
+                $obj = $holder;
+                $holder->ClosingAmountPaid = $amount;
+            } else {
+                $holder->Note = 'Closed together with holder #' . $obj->ID;
+            }
+            $holder->write();
+        }
+
         return $obj;
     }
 

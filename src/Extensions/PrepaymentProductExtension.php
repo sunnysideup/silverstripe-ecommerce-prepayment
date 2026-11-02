@@ -13,7 +13,6 @@ use SilverStripe\Forms\NumericField;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\FieldType\DBMoney;
 use SilverStripe\ORM\FieldType\DBPercentage;
-use SilverStripe\Security\Member;
 use SilverStripe\Security\Security;
 use Sunnysideup\Ecommerce\Api\ShoppingCart;
 use Sunnysideup\Ecommerce\Model\Money\EcommerceCurrency;
@@ -106,24 +105,18 @@ class PrepaymentProductExtension extends DataExtension
     }
 
 
+    /**
+     * The open (not yet used) prepayment of the logged-in customer for this product.
+     *
+     * Only the logged-in customer is used.  The billing email of a guest checkout is typed in by the
+     * visitor and is not verified, so it must never be used to look up somebody else's credit.
+     */
     public function getMemberPrepaidAmount(): float
     {
         $owner = $this->getOwner();
         $member = Security::getCurrentUser();
-        if(! $member) {
-            $order = ShoppingCart::current_order();
-            if($order) {
-                if($order->MemberID) {
-                    $member = $order->Member();
-                }
-                if(! $member) {
-                    $email = $order->BillingAddress()->Email;
-                    $member = Member::get()->filter(['Email' => $email])->first();
-                }
-            }
-        }
-        if ($member) {
-            return (float) $member->getPrepaidAmount($owner, ShoppingCart::current_order());
+        if ($member && $member->exists()) {
+            return max(0.0, (float) $member->getPrepaidAmount($owner));
         }
 
         return (float) 0;
@@ -135,14 +128,12 @@ class PrepaymentProductExtension extends DataExtension
      *
      * @return null|float
      */
-    public function getNextAmountForMember(): ?float
+    public function getNextAmountForMember(?int $quantity = 1): ?float
     {
-        $owner = $this->getOwner();
-        $price = $owner->getCalculatedPrice();
         if($this->IsOnPresale()) {
             return $this->getPresaleAmount();
         } elseif($this->IsPostPresale()) {
-            return $this->getPostPresaleAmountForMember();
+            return $this->getPostPresaleAmountForMember($quantity);
         }
         return null;
     }
@@ -179,13 +170,17 @@ class PrepaymentProductExtension extends DataExtension
      *
      * @return null|float
      */
-    public function getPostPresaleAmountForMember(): ?float
+    public function getPostPresaleAmountForMember(?int $quantity = 1): ?float
     {
         $owner = $this->getOwner();
         $price = $owner->getCalculatedPrice();
         $prepaidAmount = $owner->getMemberPrepaidAmount();
-        if($prepaidAmount) {
-            return $price - $prepaidAmount;
+        if($prepaidAmount > 0) {
+            // the prepaid amount is a total for the customer, not an amount per item:
+            // spread it over the quantity so that it is deducted once, and never go below zero.
+            $quantity = max(1, (int) $quantity);
+
+            return max(0.0, $price - ($prepaidAmount / $quantity));
         }
         return null;
     }

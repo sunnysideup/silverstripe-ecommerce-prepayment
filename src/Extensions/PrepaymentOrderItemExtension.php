@@ -30,8 +30,8 @@ class PrepaymentOrderItemExtension extends DataExtension
                     Full price is ' . $fullPriceAsMoney->Nice() . ' per item.
                     <br />Remaining amount to be paid on arrival is ' . $remainingAmountAsMoney->Nice() . '.</strong>';
             } elseif($product->IsPostPresale()) {
-                $amount = $product->getNextAmountForMember();
-                if((float) $amount !== (float) 0) {
+                $amount = $product->getNextAmountForMember((int) $owner->Quantity);
+                if($amount !== null && (float) $amount !== (float) 0) {
                     $fullPriceAsMoney = $product->CalculatedPriceAsMoney();
                     $memberPrepaidAmount = $product->getMemberPrepaidAmountAsMoney();
                     return '<strong>Prepayment of ' . $memberPrepaidAmount->Nice() . ' deducted from the full price of ' . $fullPriceAsMoney->Nice() . '.</strong>';
@@ -57,7 +57,7 @@ class PrepaymentOrderItemExtension extends DataExtension
         $owner = $this->getOwner();
         $product = $owner->Product();
         if($product && ($product->IsOnPresale() || $product->IsPostPresale())) {
-            return $product->getNextAmountForMember();
+            return $product->getNextAmountForMember((int) $owner->Quantity);
         }
         return null;
     }
